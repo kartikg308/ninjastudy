@@ -5,22 +5,31 @@ import 'dart:developer' as dev;
 import 'package:chat_bubbles/bubbles/bubble_special_three.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:get/get.dart';
 import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:http/http.dart' as http;
 
+List chatHistory = [];
+
 class Chatting extends StatefulWidget {
-  const Chatting({Key? key}) : super(key: key);
+  final int index;
+  final bool isNew;
+  // ignore: prefer_typing_uninitialized_variables
+  final data;
+  const Chatting({
+    Key? key,
+    required this.index,
+    this.data,
+    required this.isNew,
+  }) : super(key: key);
 
   @override
   // ignore: library_private_types_in_public_api
   _ChattingState createState() => _ChattingState();
 }
 
-/// An example that demonstrates the basic functionality of the
-/// SpeechToText plugin for using the speech recognition capability
-/// of the underlying platform.
 class _ChattingState extends State<Chatting> {
   List<dynamic> list = [];
   List<dynamic> chat = [];
@@ -47,8 +56,13 @@ class _ChattingState extends State<Chatting> {
   @override
   void initState() {
     super.initState();
-    getResponse();
     initSpeechState();
+    if (widget.isNew) {
+      getResponse();
+    } else {
+      chat = widget.data;
+    }
+    setState(() {});
   }
 
   _scrollToEnd() async {
@@ -122,50 +136,65 @@ class _ChattingState extends State<Chatting> {
       _needsScroll = false;
       setState(() {});
     }
-    return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      appBar: AppBar(
-        title: const Text('Arya'),
-        centerTitle: true,
-        elevation: 0,
-      ),
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height - 150,
-        child: ListView.builder(
-          controller: _scrollController,
-          physics: const BouncingScrollPhysics(),
-          itemCount: chat.length,
-          itemBuilder: (BuildContext context, int index) {
-            dev.log(chat.length.toString());
-            dev.log(chat[index].runtimeType.toString());
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                BubbleSpecialThree(
-                  text: chat[index]["bot"],
-                  isSender: false,
-                  color: Colors.blueGrey,
-                  tail: false,
-                  textStyle: const TextStyle(color: Colors.white, fontSize: 16),
-                ),
-                BubbleSpecialThree(
-                  text: chat[index]["human"],
-                  isSender: true,
-                  color: const Color(0xFF1B97F3),
-                  tail: false,
-                  textStyle: const TextStyle(color: Colors.white, fontSize: 16),
-                ),
-              ],
-            );
-          },
+    return WillPopScope(
+      onWillPop: () {
+        if (widget.isNew) {
+          chatHistory.add(chat);
+        }
+        setState(() {});
+        Get.offAndToNamed('/Home');
+        return Future.value(true);
+      },
+      child: Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        appBar: AppBar(
+          title: const Text('Arya'),
+          centerTitle: true,
+          elevation: 0,
         ),
-      ),
-      floatingActionButton: SpeechControlWidget(
-        _hasSpeech,
-        speech.isListening,
-        startListening,
-        stopListening,
-        cancelListening,
+        body: SizedBox(
+          height: MediaQuery.of(context).size.height - 150,
+          child: ListView.builder(
+            controller: _scrollController,
+            physics: const BouncingScrollPhysics(),
+            itemCount: chat.length,
+            itemBuilder: (BuildContext context, int index) {
+              dev.log(chat.length.toString());
+              dev.log(chat[index].runtimeType.toString());
+              if (widget.isNew == false) {
+                chatHistory[widget.index] = chat;
+              }
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  BubbleSpecialThree(
+                    text: chat[index]["human"],
+                    isSender: true,
+                    color: const Color(0xFF1B97F3),
+                    tail: false,
+                    textStyle:
+                        const TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                  BubbleSpecialThree(
+                    text: chat[index]["bot"],
+                    isSender: false,
+                    color: Colors.blueGrey,
+                    tail: false,
+                    textStyle:
+                        const TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+        floatingActionButton: SpeechControlWidget(
+          _hasSpeech,
+          speech.isListening,
+          startListening,
+          stopListening,
+          cancelListening,
+        ),
       ),
     );
   }

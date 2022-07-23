@@ -55,43 +55,82 @@ class Home extends StatelessWidget {
               ),
               SizedBox(
                 height: 600,
-                child: ListView.builder(
-                  itemCount: 1,
-                  itemBuilder: (BuildContext context, int index) {
-                    return ListTile(
-                      title: const Text(
-                        "Hello",
-                        style: TextStyle(
-                          fontSize: 25,
-                        ),
+                child: chatHistory.isNotEmpty
+                    ? const ConversationList()
+                    : const Center(
+                        child: Text("No Conversation"),
                       ),
-                      subtitle: const Text(
-                        "How are you?",
-                        style: TextStyle(
-                          fontSize: 15,
-                        ),
-                      ),
-                      trailing: IconButton(
-                        onPressed: () {},
-                        icon: const Icon(
-                          Icons.delete,
-                          color: Colors.red,
-                        ),
-                      ),
-                      leading: IconButton(
-                        onPressed: () {},
-                        icon: const Icon(
-                          Icons.chat,
-                        ),
-                      ),
-                    );
-                  },
-                ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class ConversationList extends StatefulWidget {
+  const ConversationList({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<ConversationList> createState() => _ConversationListState();
+}
+
+class _ConversationListState extends State<ConversationList> {
+  @override
+  void initState() {
+    super.initState();
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: chatHistory.length,
+      itemBuilder: (BuildContext context, int index) {
+        Future.delayed(const Duration(seconds: 3), () {
+          setState(() {});
+        });
+        return ListTile(
+          onTap: () {
+            Get.to(() => Chatting(
+                  index: index,
+                  data: chatHistory[index],
+                  isNew: false,
+                ));
+          },
+          title: Text(
+            "Conversation #${index + 1}",
+            style: const TextStyle(
+              fontSize: 25,
+            ),
+          ),
+          subtitle: const Text(
+            "How are you?",
+            style: TextStyle(
+              fontSize: 15,
+            ),
+          ),
+          trailing: IconButton(
+            onPressed: () {
+              chatHistory.removeAt(index);
+              setState(() {});
+            },
+            icon: const Icon(
+              Icons.delete,
+              color: Colors.red,
+            ),
+          ),
+          leading: IconButton(
+            onPressed: () {},
+            icon: const Icon(
+              Icons.chat,
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -107,7 +146,11 @@ class CustomContainer extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: InkWell(
         onTap: () {
-          Get.to(() => const Chatting());
+          Get.to(() => Chatting(
+                isNew: true,
+                index: 0,
+                data: chatHistory,
+              ));
         },
         child: Container(
           height: 80,
