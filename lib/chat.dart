@@ -11,6 +11,8 @@ import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:http/http.dart' as http;
 
+import 'main.dart';
+
 List chatHistory = [];
 
 class Chatting extends StatefulWidget {
@@ -141,8 +143,8 @@ class _ChattingState extends State<Chatting> {
         if (widget.isNew) {
           chatHistory.add(chat);
         }
+        Get.back();
         setState(() {});
-        Get.offAndToNamed('/Home');
         return Future.value(true);
       },
       child: Scaffold(
@@ -152,42 +154,46 @@ class _ChattingState extends State<Chatting> {
           centerTitle: true,
           elevation: 0,
         ),
-        body: SizedBox(
-          height: MediaQuery.of(context).size.height - 150,
-          child: ListView.builder(
-            controller: _scrollController,
-            physics: const BouncingScrollPhysics(),
-            itemCount: chat.length,
-            itemBuilder: (BuildContext context, int index) {
-              dev.log(chat.length.toString());
-              dev.log(chat[index].runtimeType.toString());
-              if (widget.isNew == false) {
-                chatHistory[widget.index] = chat;
-              }
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  BubbleSpecialThree(
-                    text: chat[index]["human"],
-                    isSender: true,
-                    color: const Color(0xFF1B97F3),
-                    tail: false,
-                    textStyle:
-                        const TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                  BubbleSpecialThree(
-                    text: chat[index]["bot"],
-                    isSender: false,
-                    color: Colors.blueGrey,
-                    tail: false,
-                    textStyle:
-                        const TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                ],
-              );
-            },
-          ),
-        ),
+        body: chat.isNotEmpty
+            ? SizedBox(
+                height: MediaQuery.of(context).size.height - 150,
+                child: ListView.builder(
+                  controller: _scrollController,
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: chat.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    dev.log(chat.length.toString());
+                    dev.log(chat[index].runtimeType.toString());
+                    if (widget.isNew == false) {
+                      chatHistory[widget.index] = chat;
+                    }
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        BubbleSpecialThree(
+                          text: chat[index]["human"],
+                          isSender: true,
+                          color: const Color(0xFF1B97F3),
+                          tail: false,
+                          textStyle: const TextStyle(
+                              color: Colors.white, fontSize: 16),
+                        ),
+                        BubbleSpecialThree(
+                          text: chat[index]["bot"],
+                          isSender: false,
+                          color: Colors.blueGrey,
+                          tail: false,
+                          textStyle: const TextStyle(
+                              color: Colors.white, fontSize: 16),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              )
+            : const Center(
+                child: CircularProgressIndicator(),
+              ),
         floatingActionButton: SpeechControlWidget(
           _hasSpeech,
           speech.isListening,

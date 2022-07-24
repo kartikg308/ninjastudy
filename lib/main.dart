@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ninjastudy/chat.dart';
@@ -9,60 +11,86 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
+    return const GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(
-                height: 50,
-              ),
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text(
-                  "Hello! Kartik,",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                  ),
+      home: HomeWidget(),
+    );
+  }
+}
+
+class HomeWidget extends StatefulWidget {
+  const HomeWidget({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<HomeWidget> createState() => _HomeWidgetState();
+}
+
+class _HomeWidgetState extends State<HomeWidget> {
+  @override
+  Widget build(BuildContext context) {
+    Timer.periodic(const Duration(seconds: 2), (t) {
+      setState(() {});
+    });
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(
+              height: 50,
+            ),
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                "Hello! Kartik,",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text(
-                  "Welcome I am Arya your personal AI english tutor",
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.grey,
-                    fontWeight: FontWeight.bold,
-                  ),
+            ),
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                "Welcome I am Arya your personal AI english tutor",
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Colors.grey,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              const CustomContainer(),
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text(
-                  "Conversation List",
-                  style: TextStyle(
-                    fontSize: 25,
-                    color: Colors.black54,
-                    fontWeight: FontWeight.bold,
-                  ),
+            ),
+            const CustomContainer(),
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                "Conversation List",
+                style: TextStyle(
+                  fontSize: 25,
+                  color: Colors.black54,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(
-                height: 600,
-                child: chatHistory.isNotEmpty
-                    ? const ConversationList()
-                    : const Center(
-                        child: Text("No Conversation"),
+            ),
+            SizedBox(
+              height: 600,
+              child: chatHistory.isNotEmpty
+                  ? const ConversationList()
+                  : const Center(
+                      child: Text(
+                        "No Conversation",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          color: Colors.black54,
+                        ),
                       ),
-              ),
-            ],
-          ),
+                    ),
+            ),
+          ],
         ),
       ),
     );
